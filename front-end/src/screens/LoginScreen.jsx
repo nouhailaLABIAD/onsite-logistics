@@ -32,36 +32,40 @@ const LoginScreen = ({ navigation }) => {
     }
   }, [user]);
 
-  const handleLogin = async () => {
-    setError("");
+ const handleLogin = async () => {
+  setError("");
 
-    if (!email || !password) {
-      setError("Please fill all fields");
-      return;
-    }
+  if (!email || !password) {
+    setError("Please fill all fields");
+    return;
+  }
 
-    try {
-      dispatch(loginStart());
-      setLoadingLocal(true);
+  try {
+    dispatch(loginStart());
+    setLoadingLocal(true);
 
-      const res = await AuthAPI.post("/auth/login", {
-        email,
-        password,
-      });
+    console.log("📤 SENDING:", { email, password });
 
-      console.log("LOGIN SUCCESS:", res.data);
+    const res = await AuthAPI.post("/auth/login", {
+      email,
+      password,
+    });
 
-      // 🔥 IMPORTANT : update Redux
-      dispatch(loginSuccess(res.data));
+    console.log("✅ LOGIN SUCCESS:", res.data);
 
-    } catch (err) {
-      const msg = err?.response?.data?.message || "Login failed";
-      dispatch(loginFailure(msg));
-      setError(msg);
-    } finally {
-      setLoadingLocal(false);
-    }
-  };
+    dispatch(loginSuccess(res.data));
+
+  } catch (err) {
+    console.log("❌ ERROR FULL:", err);
+    console.log("❌ ERROR DATA:", err?.response?.data);
+
+    const msg = err?.response?.data?.message || "Login failed";
+    dispatch(loginFailure(msg));
+    setError(msg);
+  } finally {
+    setLoadingLocal(false);
+  }
+};
 
   return (
     <SafeAreaView style={styles.container}>

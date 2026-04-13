@@ -2,14 +2,14 @@ import { IsEmail, IsString, MinLength, IsIn } from "class-validator";
 
 export class CreateUserDto {
   @IsString()
-  fullName: string;
+  fullName!: string;
 
   @IsEmail()
-  email: string;
+  email!: string;
 
   @MinLength(6)
-  password: string;
+  password!: string;
 
-  @IsIn(["driver", "receiver"])
-  role: "driver" | "receiver";
+  @IsIn(["admin", "driver", "receiver"]) // ✅ FIX
+  role!: "admin" | "driver" | "receiver"; // ✅ FIX
 }

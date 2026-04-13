@@ -33,12 +33,14 @@ const RegisterScreen = ({ navigation }) => {
         password,
         role,
       });
-
+     
       console.log("REGISTER SUCCESS:", res.data);
 
       navigation.navigate("Login");
 
     } catch (err) {
+       console.log("❌ ERROR FULL:", err);
+    console.log("❌ ERROR DATA:", err?.response?.data);
       const msg = err?.response?.data?.message || "Register failed";
       setError(msg);
     } finally {

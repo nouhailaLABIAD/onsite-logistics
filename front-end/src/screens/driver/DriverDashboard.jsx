@@ -1,5 +1,3 @@
-// src/screens/driver/DriverDashboard.jsx
-
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -7,7 +5,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const DriverDashboard = ({ navigation }) => {
 
   const handleLogout = () => {
-    // plus tard: clear token redux
     navigation.replace("Login");
   };
 
@@ -22,17 +19,22 @@ const DriverDashboard = ({ navigation }) => {
         Welcome Driver
       </Text>
 
+      {/* 🔥 BOUTON TRIPS */}
       <TouchableOpacity
-        onPress={handleLogout}
+        onPress={() => {
+          console.log("GO TO TRIPS");
+          navigation.navigate("App", { screen: "Trips" });
+        }}
         style={{
-          marginTop: 30,
-          backgroundColor: "red",
+          marginTop: 20,
+          backgroundColor: "#6C63FF",
           padding: 12,
           borderRadius: 8,
         }}
       >
-        <Text style={{ color: "white" }}>Logout</Text>
+        <Text style={{ color: "white" }}>Go to Trips</Text>
       </TouchableOpacity>
+
 
     </SafeAreaView>
   );

@@ -21,17 +21,7 @@ const ReceiverDashboard = ({ navigation }) => {
         Welcome Receiver
       </Text>
 
-      <TouchableOpacity
-        onPress={handleLogout}
-        style={{
-          marginTop: 30,
-          backgroundColor: "red",
-          padding: 12,
-          borderRadius: 8,
-        }}
-      >
-        <Text style={{ color: "white" }}>Logout</Text>
-      </TouchableOpacity>
+      
 
     </SafeAreaView>
   );

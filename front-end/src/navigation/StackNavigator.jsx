@@ -7,7 +7,7 @@ import HomeScreen from "../screens/HomeScreen";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import DriverDashboard from "../screens/driver/DriverDashboard";
-import ReceiverDashboard from "../screens/receiver/ReceiverDashboard ";
+import ReceiverDashboard from "../screens/receiver/ReceiverDashboard";
 import DrawerNavigator from "./DrawerNavigator";
 const Stack = createNativeStackNavigator();
 

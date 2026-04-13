@@ -10,7 +10,10 @@ export class UserController {
   create(@Body() body: CreateUserDto) {
     return this.userService.create(body);
   }
-
+   @Get("receivers")
+findReceivers() {
+  return this.userService.findByRole("receiver");
+}
   @Get()
   findAll() {
     return this.userService.findAll();

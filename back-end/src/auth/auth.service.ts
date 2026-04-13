@@ -14,11 +14,12 @@ export class AuthService {
 
   async register(dto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-
+     console.log('⚙️ Service register:', dto);
     const user = await this.userService.create({
       ...dto,
       password: hashedPassword,
     });
+      console.log('🧱 User créé:', user);
 
     return { message: "User created", user };
   }

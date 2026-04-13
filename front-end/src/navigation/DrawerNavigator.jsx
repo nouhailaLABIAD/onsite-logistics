@@ -1,10 +1,8 @@
-// src/navigation/DrawerNavigator.jsx
-
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { useSelector } from "react-redux";
 import { View, Text } from "react-native";
-
+import CreateMission from "../screens/Admin/CreateMission";
 import TabNavigator from "./TabNavigator";
 import DriverTrips from "../screens/driver/DriverTrips";
 import ReceiverParcels from "../screens/receiver/ReceiverParcels";
@@ -16,7 +14,6 @@ const DrawerNavigator = () => {
 
   console.log("ROLE DRAWER:", user?.role);
 
-  // 🔥 ATTEND QUE USER EXISTE
   if (!user) {
     return (
       <View style={{ flex:1, justifyContent:"center", alignItems:"center" }}>
@@ -30,14 +27,17 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator screenOptions={{ headerShown: false }}>
       
-      {/* DASHBOARD COMMUN */}
+      {/* 🔥 TAB NAVIGATOR (Home = Dashboard dynamique) */}
       <Drawer.Screen name="Dashboard" component={TabNavigator} />
 
       {/* DRIVER */}
       {role === "driver" && (
         <Drawer.Screen name="Trips" component={DriverTrips} />
       )}
-
+      
+      {role === "admin" && (
+      <Drawer.Screen name="Create Mission" component={CreateMission} />
+    )}
       {/* RECEIVER */}
       {role === "receiver" && (
         <Drawer.Screen name="Parcels" component={ReceiverParcels} />

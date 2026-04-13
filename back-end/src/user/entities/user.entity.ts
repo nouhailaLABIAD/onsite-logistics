@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
-export type UserRole = "driver" | "receiver";
+export type UserRole = "admin" | "driver" | "receiver";
 
 @Entity()
 export class User {

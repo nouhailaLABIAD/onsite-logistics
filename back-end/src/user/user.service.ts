@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
+import { UserRole } from "./entities/user.entity";
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,11 @@ export class UserService {
     const user = this.userRepo.create(userData);
     return this.userRepo.save(user);
   }
-
+  findByRole(role: UserRole) {
+  return this.userRepo.find({
+    where: { role },
+  });
+}
   findAll() {
     return this.userRepo.find();
   }

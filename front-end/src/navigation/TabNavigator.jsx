@@ -1,16 +1,22 @@
-// src/navigation/TabNavigator.jsx
-
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { useSelector } from "react-redux";
 
-import HomeDashboard from "../screens/common/HomeDashboard";
+import DriverDashboard from "../screens/driver/DriverDashboard";
+import ReceiverDashboard from "../screens/receiver/ReceiverDashboard";
 import Profile from "../screens/common/Profile";
 import Settings from "../screens/common/Settings";
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  const user = useSelector((state) => state.auth.user);
+
+  if (!user) return null;
+
+  const role = user.role;
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -27,7 +33,12 @@ const TabNavigator = () => {
         tabBarActiveTintColor: "#6C63FF",
       })}
     >
-      <Tab.Screen name="Home" component={HomeDashboard} />
+      {/* 🔥 DASHBOARD SELON ROLE */}
+      <Tab.Screen
+        name="Home"
+        component={role === "driver" ? DriverDashboard : ReceiverDashboard}
+      />
+
       <Tab.Screen name="Profile" component={Profile} />
       <Tab.Screen name="Settings" component={Settings} />
     </Tab.Navigator>
