@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AuthAPI from "../../services/AuthAPI";
 
@@ -15,20 +9,26 @@ const CreateMission = () => {
   const [priority, setPriority] = useState("medium");
 
   const [receivers, setReceivers] = useState([]);
-  const [selectedReceiver, setSelectedReceiver] = useState(null);
+  const [vehicles, setVehicles] = useState([]);
 
-  // 🔥 FETCH RECEIVERS
+  const [selectedReceiver, setSelectedReceiver] = useState(null);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+
+  // 🔥 fetch receivers
   const fetchReceivers = async () => {
-    try {
-      const res = await AuthAPI.get("/users/receivers");
-      setReceivers(res.data);
-    } catch (err) {
-      console.log("ERROR RECEIVERS:", err.response?.data);
-    }
+    const res = await AuthAPI.get("/users/receivers");
+    setReceivers(res.data);
+  };
+
+  // 🚗 fetch vehicles
+  const fetchVehicles = async () => {
+    const res = await AuthAPI.get("/vehicles");
+    setVehicles(res.data);
   };
 
   useEffect(() => {
     fetchReceivers();
+    fetchVehicles();
   }, []);
 
   const handleCreate = async () => {
@@ -38,6 +38,7 @@ const CreateMission = () => {
         dropoffLocation: dropoff,
         priority,
         receiverId: selectedReceiver,
+        vehicleId: selectedVehicle, // ⭐ IMPORTANT
       });
 
       console.log("MISSION CREATED:", res.data);
@@ -48,13 +49,14 @@ const CreateMission = () => {
 
   return (
     <SafeAreaView style={{ padding: 20 }}>
+
       <Text style={{ fontSize: 20 }}>Create Mission</Text>
 
       <TextInput
         placeholder="Pickup"
         value={pickup}
         onChangeText={setPickup}
-        style={{ borderWidth: 1, marginBottom: 10 }}
+        style={{ borderWidth: 1 }}
       />
 
       <TextInput
@@ -64,9 +66,8 @@ const CreateMission = () => {
         style={{ borderWidth: 1, marginBottom: 10 }}
       />
 
-      {/* 🔥 LIST RECEIVERS */}
-      <Text>Select Receiver:</Text>
-
+      {/* 👤 RECEIVER */}
+      <Text>Select Receiver</Text>
       <FlatList
         data={receivers}
         keyExtractor={(item) => item.id.toString()}
@@ -75,28 +76,47 @@ const CreateMission = () => {
             onPress={() => setSelectedReceiver(item.id)}
             style={{
               padding: 10,
-              marginVertical: 5,
-              backgroundColor:
-                selectedReceiver === item.id ? "green" : "#eee",
+              backgroundColor: selectedReceiver === item.id ? "green" : "#eee",
+              marginBottom: 5,
             }}
           >
-            <Text>
-              {item.fullName} ({item.email})
-            </Text>
+            <Text>{item.email}</Text>
           </TouchableOpacity>
         )}
       />
 
+      {/* 🚗 VEHICLES */}
+      <Text style={{ marginTop: 20 }}>Select Vehicle</Text>
+
+      <FlatList
+        data={vehicles}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => setSelectedVehicle(item.id)}
+            style={{
+              padding: 10,
+              backgroundColor: selectedVehicle === item.id ? "blue" : "#eee",
+              marginBottom: 5,
+            }}
+          >
+            <Text>🚗 {item.plateNumber}</Text>
+          </TouchableOpacity>
+        )}
+      />
+
+      {/* CREATE */}
       <TouchableOpacity
         onPress={handleCreate}
         style={{
-          backgroundColor: "blue",
-          padding: 10,
+          backgroundColor: "black",
+          padding: 15,
           marginTop: 20,
         }}
       >
-        <Text style={{ color: "white" }}>Create</Text>
+        <Text style={{ color: "white" }}>Create Mission</Text>
       </TouchableOpacity>
+
     </SafeAreaView>
   );
 };

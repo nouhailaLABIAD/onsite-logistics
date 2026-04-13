@@ -16,9 +16,10 @@ const DriverTrips = () => {
 
   const user = useSelector((state) => state.auth.user);
 
-  // 🎨 COLOR STATUS
+  // 🎨 STATUS COLORS
   const getStatusColor = (status) => {
     if (status === "pending") return "gray";
+    if (status === "accepted") return "blue";
     if (status === "in_progress") return "orange";
     if (status === "completed") return "green";
     return "black";
@@ -26,8 +27,9 @@ const DriverTrips = () => {
 
   // 🔥 FETCH MISSIONS
   const fetchMissions = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
+
       const res = await AuthAPI.get("/missions");
 
       const filtered = res.data.filter(
@@ -44,45 +46,58 @@ const DriverTrips = () => {
     }
   };
 
-  // 🔥 ACTIONS
+  // 🚀 ACCEPT
   const handleAccept = async (id) => {
-    await AuthAPI.patch(`/missions/${id}/assign`, {
-      driverId: user.id,
-    });
-    fetchMissions();
+    try {
+      await AuthAPI.patch(`/missions/${id}/assign`, {
+        driverId: user.id,
+      });
+
+      await AuthAPI.patch(`/missions/${id}/status`, {
+        status: "accepted",
+      });
+
+      fetchMissions();
+    } catch (err) {
+      console.log("ACCEPT ERROR:", err.response?.data);
+    }
   };
 
+  // 🚀 START
   const handleStart = async (id) => {
-    await AuthAPI.patch(`/missions/${id}/status`, {
-      status: "in_progress",
-    });
-    fetchMissions();
+    try {
+      await AuthAPI.patch(`/missions/${id}/status`, {
+        status: "in_progress",
+      });
+
+      fetchMissions();
+    } catch (err) {
+      console.log("START ERROR:", err.response?.data);
+    }
   };
 
+  // 🚀 COMPLETE
   const handleComplete = async (id) => {
-    await AuthAPI.patch(`/missions/${id}/status`, {
-      status: "completed",
-    });
-    fetchMissions();
+    try {
+      await AuthAPI.patch(`/missions/${id}/status`, {
+        status: "completed",
+      });
+
+      fetchMissions();
+    } catch (err) {
+      console.log("COMPLETE ERROR:", err.response?.data);
+    }
   };
 
-  // 🔄 AUTO REFRESH
+  // 🔄 LOAD ON FOCUS (clean)
   useEffect(() => {
     fetchMissions();
-    const interval = setInterval(fetchMissions, 5000);
-    return () => clearInterval(interval);
   }, []);
 
-  if (loading) {
-    return (
-      <SafeAreaView>
-        <ActivityIndicator size="large" />
-      </SafeAreaView>
-    );
-  }
+  // 📦 AVAILABLE MISSIONS
+  const available = missions.filter((m) => m.status === "pending");
 
-  // 🔥 SEPARATION
-  const available = missions.filter((m) => m.driverId === null);
+  // 🚚 MY MISSIONS
   const myMissions = missions.filter(
     (m) => Number(m.driverId) === Number(user.id)
   );
@@ -105,60 +120,69 @@ const DriverTrips = () => {
 
       <Text>🔥 Priority: {item.priority}</Text>
 
-      {/* ACCEPT */}
+      {/* 🟡 ACCEPT */}
       {item.status === "pending" && !item.driverId && (
         <TouchableOpacity
           onPress={() => handleAccept(item.id)}
           style={{
             marginTop: 10,
             backgroundColor: "orange",
-            padding: 8,
-            borderRadius: 5,
+            padding: 10,
+            borderRadius: 6,
           }}
         >
           <Text style={{ color: "white" }}>Accept</Text>
         </TouchableOpacity>
       )}
 
-      {/* START */}
-      {item.status === "pending" &&
+      {/* 🟢 START */}
+      {item.status === "accepted" &&
         Number(item.driverId) === Number(user.id) && (
           <TouchableOpacity
             onPress={() => handleStart(item.id)}
             style={{
               marginTop: 10,
               backgroundColor: "green",
-              padding: 8,
-              borderRadius: 5,
+              padding: 10,
+              borderRadius: 6,
             }}
           >
             <Text style={{ color: "white" }}>Start</Text>
           </TouchableOpacity>
         )}
 
-      {/* COMPLETE */}
-      {item.status === "in_progress" && (
-        <TouchableOpacity
-          onPress={() => handleComplete(item.id)}
-          style={{
-            marginTop: 10,
-            backgroundColor: "blue",
-            padding: 8,
-            borderRadius: 5,
-          }}
-        >
-          <Text style={{ color: "white" }}>Complete</Text>
-        </TouchableOpacity>
-      )}
+      {/* 🔵 COMPLETE */}
+      {item.status === "in_progress" &&
+        Number(item.driverId) === Number(user.id) && (
+          <TouchableOpacity
+            onPress={() => handleComplete(item.id)}
+            style={{
+              marginTop: 10,
+              backgroundColor: "blue",
+              padding: 10,
+              borderRadius: 6,
+            }}
+          >
+            <Text style={{ color: "white" }}>Complete</Text>
+          </TouchableOpacity>
+        )}
 
-      {/* DONE */}
+      {/* ✅ DONE */}
       {item.status === "completed" && (
-        <Text style={{ marginTop: 10, color: "gray" }}>
+        <Text style={{ marginTop: 10, color: "green" }}>
           ✅ Completed
         </Text>
       )}
     </View>
   );
+
+  if (loading) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <ActivityIndicator size="large" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, padding: 20 }}>

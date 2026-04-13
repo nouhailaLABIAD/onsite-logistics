@@ -2,10 +2,14 @@ import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { useSelector } from "react-redux";
 import { View, Text } from "react-native";
+
 import CreateMission from "../screens/Admin/CreateMission";
 import TabNavigator from "./TabNavigator";
 import DriverTrips from "../screens/driver/DriverTrips";
 import ReceiverParcels from "../screens/receiver/ReceiverParcels";
+
+import VehiclesScreen from "../screens/Admin/VehiclesScreen";
+import AddVehicleScreen from "../screens/Admin/AddVehicleScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -26,21 +30,27 @@ const DrawerNavigator = () => {
 
   return (
     <Drawer.Navigator screenOptions={{ headerShown: false }}>
-      
-      {/* 🔥 TAB NAVIGATOR (Home = Dashboard dynamique) */}
+
+      {/* DASHBOARD COMMUN */}
       <Drawer.Screen name="Dashboard" component={TabNavigator} />
 
       {/* DRIVER */}
       {role === "driver" && (
         <Drawer.Screen name="Trips" component={DriverTrips} />
       )}
-      
-      {role === "admin" && (
-      <Drawer.Screen name="Create Mission" component={CreateMission} />
-    )}
+
       {/* RECEIVER */}
       {role === "receiver" && (
         <Drawer.Screen name="Parcels" component={ReceiverParcels} />
+      )}
+
+      {/* ADMIN */}
+      {role === "admin" && (
+        <>
+          <Drawer.Screen name="Create Mission" component={CreateMission} />
+          <Drawer.Screen name="Vehicles" component={VehiclesScreen} />
+          <Drawer.Screen name="Add Vehicle" component={AddVehicleScreen} />
+        </>
       )}
 
     </Drawer.Navigator>

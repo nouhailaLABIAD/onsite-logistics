@@ -1,7 +1,6 @@
-import { IsString, IsIn, IsNumber } from "class-validator";
+import { IsString, IsIn, IsNumber, IsOptional } from "class-validator";
 
 export class CreateMissionDto {
-
   @IsNumber()
   receiverId!: number;
 
@@ -11,6 +10,11 @@ export class CreateMissionDto {
   @IsString()
   dropoffLocation!: string;
 
-  @IsIn(['low', 'medium', 'high'])
-  priority!: 'low' | 'medium' | 'high';
+  @IsIn(["low", "medium", "high"])
+  priority!: "low" | "medium" | "high";
+
+  // 🚗 AJOUT ICI
+  @IsOptional()
+  @IsNumber()
+  vehicleId?: number;
 }

@@ -11,18 +11,21 @@ export class Mission {
   @Column()
   dropoffLocation!: string;
 
-  @Column({ default: 'pending' })
-  status!: 'pending' | 'accepted' | 'in_progress' | 'completed';
+  @Column({ default: "pending" })
+  status!: "pending" | "accepted" | "in_progress" | "completed";
 
   @Column()
-  priority!: 'low' | 'medium' | 'high';
+  priority!: "low" | "medium" | "high";
 
   @Column({ nullable: true })
-  driverId!: number;
+  driverId?: number;
 
+  @Column()
+  receiverId!: number;
 
-@Column({ nullable: true })
-receiverId!: number;
+  // 🚗 IMPORTANT
+  @Column({ nullable: true })
+  vehicleId?: number;
 
   @CreateDateColumn()
   createdAt!: Date;
