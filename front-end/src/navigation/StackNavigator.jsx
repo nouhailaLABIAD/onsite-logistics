@@ -9,6 +9,7 @@ import RegisterScreen from "../screens/RegisterScreen";
 import DriverDashboard from "../screens/driver/DriverDashboard";
 import ReceiverDashboard from "../screens/receiver/ReceiverDashboard";
 import DrawerNavigator from "./DrawerNavigator";
+import ChangePassword from "../screens/common/ChangePassword";
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
@@ -32,6 +33,10 @@ const StackNavigator = () => {
         component={RegisterScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen 
+  name="ChangePassword" 
+  component={ChangePassword} 
+/>
       {/* <Stack.Screen name="DriverDashboard" component={DriverDashboard} />
 <Stack.Screen name="ReceiverDashboard" component={ReceiverDashboard} /> */}
       <Stack.Screen name="App" component={DrawerNavigator} />

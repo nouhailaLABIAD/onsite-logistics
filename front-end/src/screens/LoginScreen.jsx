@@ -16,7 +16,6 @@ import styles from "../styles/loginStyle";
 
 const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-
   const user = useSelector((state) => state.auth.user);
 
   const [email, setEmail] = useState("");
@@ -24,48 +23,51 @@ const LoginScreen = ({ navigation }) => {
   const [loadingLocal, setLoadingLocal] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔥 NAVIGATION APRÈS QUE REDUX SOIT MIS À JOUR
+  // 🔥 Redirection APRÈS authentification – avec RESET de la pile
   useEffect(() => {
     if (user) {
       console.log("USER READY:", user);
-      navigation.replace("App");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "App" }],
+      });
     }
   }, [user]);
 
- const handleLogin = async () => {
-  setError("");
+  const handleLogin = async () => {
+    setError("");
 
-  if (!email || !password) {
-    setError("Please fill all fields");
-    return;
-  }
+    if (!email || !password) {
+      setError("Please fill all fields");
+      return;
+    }
 
-  try {
-    dispatch(loginStart());
-    setLoadingLocal(true);
+    try {
+      dispatch(loginStart());
+      setLoadingLocal(true);
 
-    console.log("📤 SENDING:", { email, password });
+      console.log("📤 SENDING:", { email, password });
 
-    const res = await AuthAPI.post("/auth/login", {
-      email,
-      password,
-    });
+      const res = await AuthAPI.post("/auth/login", {
+        email,
+        password,
+      });
 
-    console.log("✅ LOGIN SUCCESS:", res.data);
+      console.log("✅ LOGIN SUCCESS:", res.data);
 
-    dispatch(loginSuccess(res.data));
+      dispatch(loginSuccess(res.data));
 
-  } catch (err) {
-    console.log("❌ ERROR FULL:", err);
-    console.log("❌ ERROR DATA:", err?.response?.data);
+    } catch (err) {
+      console.log("❌ ERROR FULL:", err);
+      console.log("❌ ERROR DATA:", err?.response?.data);
 
-    const msg = err?.response?.data?.message || "Login failed";
-    dispatch(loginFailure(msg));
-    setError(msg);
-  } finally {
-    setLoadingLocal(false);
-  }
-};
+      const msg = err?.response?.data?.message || "Login failed";
+      dispatch(loginFailure(msg));
+      setError(msg);
+    } finally {
+      setLoadingLocal(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>

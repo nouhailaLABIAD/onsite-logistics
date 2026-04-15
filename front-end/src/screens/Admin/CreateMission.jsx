@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AuthAPI from "../../services/AuthAPI";
+import styles from "../../styles/createMissionStyle";
 
 const CreateMission = () => {
   const [pickup, setPickup] = useState("");
@@ -14,13 +15,11 @@ const CreateMission = () => {
   const [selectedReceiver, setSelectedReceiver] = useState(null);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
 
-  // 🔥 fetch receivers
   const fetchReceivers = async () => {
     const res = await AuthAPI.get("/users/receivers");
     setReceivers(res.data);
   };
 
-  // 🚗 fetch vehicles
   const fetchVehicles = async () => {
     const res = await AuthAPI.get("/vehicles");
     setVehicles(res.data);
@@ -38,85 +37,93 @@ const CreateMission = () => {
         dropoffLocation: dropoff,
         priority,
         receiverId: selectedReceiver,
-        vehicleId: selectedVehicle, // ⭐ IMPORTANT
+        vehicleId: selectedVehicle,
       });
-
       console.log("MISSION CREATED:", res.data);
     } catch (err) {
       console.log("ERROR:", err.response?.data);
     }
   };
 
+  const renderReceiverItem = ({ item }) => (
+    <TouchableOpacity
+      onPress={() => setSelectedReceiver(item.id)}
+      style={[
+        styles.selectItem,
+        selectedReceiver === item.id && styles.selectItemSelected,
+      ]}
+    >
+      <Text
+        style={[
+          styles.selectItemText,
+          selectedReceiver === item.id && styles.selectItemTextSelected,
+        ]}
+      >
+        {item.email}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  const renderVehicleItem = ({ item }) => (
+    <TouchableOpacity
+      onPress={() => setSelectedVehicle(item.id)}
+      style={[
+        styles.selectItem,
+        selectedVehicle === item.id && styles.selectItemSelected,
+      ]}
+    >
+      <Text
+        style={[
+          styles.selectItemText,
+          selectedVehicle === item.id && styles.selectItemTextSelected,
+        ]}
+      >
+        🚗 {item.plateNumber}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
-    <SafeAreaView style={{ padding: 20 }}>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Create Mission</Text>
 
-      <Text style={{ fontSize: 20 }}>Create Mission</Text>
-
+      <Text style={styles.label}>Pickup location</Text>
       <TextInput
-        placeholder="Pickup"
+        placeholder="e.g. Warehouse A"
+        placeholderTextColor="#999"
         value={pickup}
         onChangeText={setPickup}
-        style={{ borderWidth: 1 }}
+        style={styles.input}
       />
 
+      <Text style={styles.label}>Dropoff location</Text>
       <TextInput
-        placeholder="Dropoff"
+        placeholder="e.g. Office B"
+        placeholderTextColor="#999"
         value={dropoff}
         onChangeText={setDropoff}
-        style={{ borderWidth: 1, marginBottom: 10 }}
+        style={styles.input}
       />
 
-      {/* 👤 RECEIVER */}
-      <Text>Select Receiver</Text>
+      <Text style={styles.label}>Select Receiver</Text>
       <FlatList
         data={receivers}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => setSelectedReceiver(item.id)}
-            style={{
-              padding: 10,
-              backgroundColor: selectedReceiver === item.id ? "green" : "#eee",
-              marginBottom: 5,
-            }}
-          >
-            <Text>{item.email}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={renderReceiverItem}
+        style={{ marginBottom: 10 }}
       />
 
-      {/* 🚗 VEHICLES */}
-      <Text style={{ marginTop: 20 }}>Select Vehicle</Text>
-
+      <Text style={styles.label}>Select Vehicle</Text>
       <FlatList
         data={vehicles}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => setSelectedVehicle(item.id)}
-            style={{
-              padding: 10,
-              backgroundColor: selectedVehicle === item.id ? "blue" : "#eee",
-              marginBottom: 5,
-            }}
-          >
-            <Text>🚗 {item.plateNumber}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={renderVehicleItem}
+        style={{ marginBottom: 10 }}
       />
 
-      {/* CREATE */}
-      <TouchableOpacity
-        onPress={handleCreate}
-        style={{
-          backgroundColor: "black",
-          padding: 15,
-          marginTop: 20,
-        }}
-      >
-        <Text style={{ color: "white" }}>Create Mission</Text>
+      <TouchableOpacity style={styles.button} onPress={handleCreate}>
+        <Text style={styles.buttonText}>Create Mission</Text>
       </TouchableOpacity>
-
     </SafeAreaView>
   );
 };

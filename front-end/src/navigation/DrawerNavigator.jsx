@@ -10,7 +10,7 @@ import ReceiverParcels from "../screens/receiver/ReceiverParcels";
 
 import VehiclesScreen from "../screens/Admin/VehiclesScreen";
 import AddVehicleScreen from "../screens/Admin/AddVehicleScreen";
-
+import ReceiverMapScreen from "../screens/receiver/ReceiverMapScreen";
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
@@ -41,8 +41,11 @@ const DrawerNavigator = () => {
 
       {/* RECEIVER */}
       {role === "receiver" && (
-        <Drawer.Screen name="Parcels" component={ReceiverParcels} />
-      )}
+  <>
+    <Drawer.Screen name="Parcels" component={ReceiverParcels} />
+    <Drawer.Screen name="Map" component={ReceiverMapScreen} />
+  </>
+)}
 
       {/* ADMIN */}
       {role === "admin" && (

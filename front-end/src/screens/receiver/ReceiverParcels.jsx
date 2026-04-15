@@ -8,6 +8,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import AuthAPI from "../../services/AuthAPI";
+import styles from "../../styles/receiverParcelsStyle";
 
 const ReceiverParcels = () => {
   const [missions, setMissions] = useState([]);
@@ -15,15 +16,21 @@ const ReceiverParcels = () => {
 
   const user = useSelector((state) => state.auth.user);
 
+  // 🎨 STATUS COLOR (optionnel mais cohérent)
+  const getStatusColor = (status) => {
+    if (status === "pending") return "#6c757d";
+    if (status === "accepted") return "#007bff";
+    if (status === "in_progress") return "#fd7e14";
+    if (status === "completed") return "#28a745";
+    return "#000";
+  };
+
   const fetchMissions = async () => {
     try {
       const res = await AuthAPI.get("/missions");
-
-      // 🔥 FILTRER PAR RECEIVER
       const myParcels = res.data.filter(
         (m) => Number(m.receiverId) === Number(user.id)
       );
-
       setMissions(myParcels);
     } catch (err) {
       console.log("ERROR:", err.response?.data);
@@ -37,35 +44,33 @@ const ReceiverParcels = () => {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" />;
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </SafeAreaView>
+    );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-        📦 My Parcels
-      </Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>📦 My Parcels</Text>
 
       {missions.length === 0 ? (
-        <Text>No parcels</Text>
+        <Text style={styles.emptyText}>No parcels found</Text>
       ) : (
         <FlatList
           data={missions}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View
-              style={{
-                padding: 15,
-                marginTop: 10,
-                backgroundColor: "#f2f2f2",
-                borderRadius: 10,
-              }}
-            >
-              <Text>📍 From: {item.pickupLocation}</Text>
-              <Text>📦 To: {item.dropoffLocation}</Text>
-              <Text>⚡ Status: {item.status}</Text>
+            <View style={styles.card}>
+              <Text style={styles.cardText}>📍 From: {item.pickupLocation}</Text>
+              <Text style={styles.cardText}>📦 To: {item.dropoffLocation}</Text>
+              <Text style={[styles.cardText, styles.statusText, { color: getStatusColor(item.status) }]}>
+                ⚡ Status: {item.status}
+              </Text>
             </View>
           )}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </SafeAreaView>

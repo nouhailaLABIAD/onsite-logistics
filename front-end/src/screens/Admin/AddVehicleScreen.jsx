@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import VehicleAPI from "../../services/VehicleAPI";
+import styles from "../../styles/addVehicleStyle";
 
 const AddVehicleScreen = ({ navigation }) => {
   const [plate, setPlate] = useState("");
@@ -10,7 +12,6 @@ const AddVehicleScreen = ({ navigation }) => {
       await VehicleAPI.post("/vehicles", {
         plateNumber: plate,
       });
-
       setPlate("");
       navigation.goBack();
     } catch (err) {
@@ -19,35 +20,21 @@ const AddVehicleScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={{ padding: 20 }}>
-
-      <Text style={{ fontSize: 20 }}>Add Vehicle</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Add Vehicle</Text>
 
       <TextInput
         placeholder="Plate number"
+        placeholderTextColor="#999"
         value={plate}
         onChangeText={setPlate}
-        style={{
-          borderWidth: 1,
-          marginTop: 10,
-          padding: 10,
-          borderRadius: 8,
-        }}
+        style={styles.input}
       />
 
-      <TouchableOpacity
-        onPress={handleCreate}
-        style={{
-          backgroundColor: "blue",
-          padding: 12,
-          marginTop: 20,
-          borderRadius: 8,
-        }}
-      >
-        <Text style={{ color: "white" }}>Create</Text>
+      <TouchableOpacity style={styles.button} onPress={handleCreate}>
+        <Text style={styles.buttonText}>Create</Text>
       </TouchableOpacity>
-
-    </View>
+    </SafeAreaView>
   );
 };
 

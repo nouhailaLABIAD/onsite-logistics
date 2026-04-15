@@ -1,30 +1,52 @@
+// src/screens/common/Settings.jsx
+import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/authSlice";
+import styles from "../../styles/settingsStyle";
 
-export default function Settings({ navigation }) {
+const Settings = () => {
+  const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const handleLogout = () => {
     dispatch(logout());
-    navigation.replace("Login");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Login" }],
+    });
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>⚙️ Settings</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>⚙️ Settings</Text>
 
+      {/* Edit Profile */}
       <TouchableOpacity
-        onPress={handleLogout}
-        style={{
-          marginTop: 20,
-          backgroundColor: "red",
-          padding: 10,
-          borderRadius: 8,
-        }}
+        onPress={() => navigation.navigate("Profile")}
+        style={styles.menuItem}
       >
-        <Text style={{ color: "white" }}>Logout</Text>
+        <Text style={styles.menuIcon}>👤</Text>
+        <Text style={styles.menuText}>Edit Profile</Text>
       </TouchableOpacity>
-    </View>
+
+      {/* Change Password */}
+      <TouchableOpacity
+        onPress={() => navigation.navigate("ChangePassword")}
+        style={styles.menuItem}
+      >
+        <Text style={styles.menuIcon}>🔒</Text>
+        <Text style={styles.menuText}>Change Password</Text>
+      </TouchableOpacity>
+
+      {/* Logout */}
+      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+        <Text style={styles.logoutText}>🚪 Logout</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
-}
+};
+
+export default Settings;

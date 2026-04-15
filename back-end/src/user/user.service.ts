@@ -3,7 +3,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
 import { UserRole } from "./entities/user.entity";
-
+import { UpdateProfileDto } from "./dto/update-profile.dto";
+import * as bcrypt from "bcrypt";
+import { BadRequestException, UnauthorizedException } from "@nestjs/common";
+import { UpdatePasswordDto } from "./dto/update-password.dto";
 @Injectable()
 export class UserService {
   constructor(
@@ -27,4 +30,34 @@ export class UserService {
   findByEmail(email: string) {
     return this.userRepo.findOne({ where: { email } });
   }
+  async updateProfile(userId: number, dto: UpdateProfileDto) {
+  await this.userRepo.update(userId, dto);
+  return this.userRepo.findOne({
+    where: { id: userId },
+  });
+}
+async changePassword(userId: number, dto: UpdatePasswordDto) {
+  const user = await this.userRepo.findOne({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new BadRequestException("User not found");
+  }
+
+  const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
+
+  if (!isMatch) {
+    throw new UnauthorizedException("Old password incorrect");
+  }
+
+  const hashed = await bcrypt.hash(dto.newPassword, 10);
+
+  user.password = hashed;
+  await this.userRepo.save(user);
+
+  return {
+    message: "Password updated successfully",
+  };
+}
 }
