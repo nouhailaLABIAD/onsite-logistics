@@ -5,9 +5,16 @@ import { useSelector } from "react-redux";
 import AuthAPI from "../../services/AuthAPI";
 import { cityCoordinates } from "../../utils/coordinates";
 import { MaterialIcons } from "@expo/vector-icons";
+import { io } from "socket.io-client";
 
 const normalizeCity = (city) =>
   city?.toLowerCase().replace(/\s/g, "");
+
+// ⚠️ adapte ton IP backend
+const socket = io("http://192.168.1.237:3000/tracking", {
+  transports: ["websocket"],
+  autoConnect: true,
+});
 
 const ReceiverMapScreen = () => {
   const user = useSelector((state) => state.auth.user);
@@ -15,71 +22,47 @@ const ReceiverMapScreen = () => {
   const [missions, setMissions] = useState([]);
   const [driverPositions, setDriverPositions] = useState({});
 
-  // 📦 FETCH MISSIONS ONLY FOR THIS RECEIVER
+  // 📦 FETCH MISSIONS (uniquement receiver connecté)
   const fetchMissions = async () => {
     try {
       const res = await AuthAPI.get("/missions");
 
       const filtered = res.data.filter(
         (m) =>
-          m.receiverId === user.id && // 🔥 IMPORTANT FIX
+          Number(m.receiverId) === Number(user.id) &&
           m.status === "in_progress"
       );
 
       setMissions(filtered);
     } catch (err) {
-      console.log("ERROR:", err);
+      console.log("ERROR FETCH MISSIONS:", err);
     }
   };
 
   useEffect(() => {
     fetchMissions();
-
-    const interval = setInterval(fetchMissions, 5000);
-    return () => clearInterval(interval);
   }, []);
 
-  // 🚗 SIMULATION MOVEMENT
+  // 🔥 SOCKET LISTENER FIXÉ
   useEffect(() => {
-    const intervals = [];
+    const handler = (data) => {
+      console.log("📡 position reçue:", data);
 
-    missions.forEach((mission) => {
-      const pickup =
-        cityCoordinates[normalizeCity(mission.pickupLocation)];
-      const dropoff =
-        cityCoordinates[normalizeCity(mission.dropoffLocation)];
+      setDriverPositions((prev) => ({
+        ...prev,
+        [String(data.missionId)]: {
+          latitude: Number(data.latitude),
+          longitude: Number(data.longitude),
+        },
+      }));
+    };
 
-      if (!pickup || !dropoff) return;
+    socket.on("locationUpdated", handler);
 
-      let progress = 0;
-
-      const interval = setInterval(() => {
-        progress += 0.05; // ⚡ SPEED
-
-        if (progress >= 1) {
-          clearInterval(interval);
-          return;
-        }
-
-        const latitude =
-          pickup.latitude +
-          (dropoff.latitude - pickup.latitude) * progress;
-
-        const longitude =
-          pickup.longitude +
-          (dropoff.longitude - pickup.longitude) * progress;
-
-        setDriverPositions((prev) => ({
-          ...prev,
-          [mission.id]: { latitude, longitude },
-        }));
-      }, 200);
-
-      intervals.push(interval);
-    });
-
-    return () => intervals.forEach(clearInterval);
-  }, [missions]);
+    return () => {
+      socket.off("locationUpdated", handler);
+    };
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -100,6 +83,8 @@ const ReceiverMapScreen = () => {
 
           if (!pickup || !dropoff) return null;
 
+          const missionKey = String(mission.id);
+
           return (
             <React.Fragment key={mission.id}>
               {/* ROUTE */}
@@ -115,9 +100,9 @@ const ReceiverMapScreen = () => {
               {/* END */}
               <Marker coordinate={dropoff} />
 
-              {/* CAR ANIMATION */}
-              {driverPositions[mission.id] && (
-                <Marker coordinate={driverPositions[mission.id]}>
+              {/* 🚗 DRIVER REAL POSITION */}
+              {driverPositions[missionKey] && (
+                <Marker coordinate={driverPositions[missionKey]}>
                   <MaterialIcons name="local-taxi" size={40} color="red" />
                 </Marker>
               )}
@@ -137,8 +122,9 @@ const ReceiverMapScreen = () => {
           borderRadius: 10,
         }}
       >
-        <Text>🚗 Missions en cours (in_progress)</Text>
-        <Text>📍 Vue uniquement pour ce receiver</Text>
+        <Text>🚗 Tracking temps réel</Text>
+        <Text>📡 WebSocket actif</Text>
+        <Text>📍 Receiver uniquement ses missions</Text>
       </View>
     </View>
   );
