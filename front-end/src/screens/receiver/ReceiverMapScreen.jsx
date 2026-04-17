@@ -10,11 +10,10 @@ import { io } from "socket.io-client";
 const normalizeCity = (city) =>
   city?.toLowerCase().replace(/\s/g, "");
 
-// ⚠️ adapte ton IP backend
-const socket = io("http://192.168.1.237:3000/tracking", {
-  transports: ["websocket"],
-  autoConnect: true,
-});
+const socket = io("http://192.168.1.237:3000/tracking");
+
+// 👉 mission LIVE (WebSocket)
+const LIVE_MISSION_ID = 15;
 
 const ReceiverMapScreen = () => {
   const user = useSelector((state) => state.auth.user);
@@ -22,7 +21,7 @@ const ReceiverMapScreen = () => {
   const [missions, setMissions] = useState([]);
   const [driverPositions, setDriverPositions] = useState({});
 
-  // 📦 FETCH MISSIONS (uniquement receiver connecté)
+  // 📦 FETCH MISSIONS
   const fetchMissions = async () => {
     try {
       const res = await AuthAPI.get("/missions");
@@ -35,7 +34,7 @@ const ReceiverMapScreen = () => {
 
       setMissions(filtered);
     } catch (err) {
-      console.log("ERROR FETCH MISSIONS:", err);
+      console.log(err);
     }
   };
 
@@ -43,10 +42,10 @@ const ReceiverMapScreen = () => {
     fetchMissions();
   }, []);
 
-  // 🔥 SOCKET LISTENER FIXÉ
+  // 🔥 SOCKET ONLY FOR LIVE MISSION
   useEffect(() => {
-    const handler = (data) => {
-      console.log("📡 position reçue:", data);
+    socket.on("locationUpdated", (data) => {
+      if (Number(data.missionId) !== LIVE_MISSION_ID) return;
 
       setDriverPositions((prev) => ({
         ...prev,
@@ -55,14 +54,54 @@ const ReceiverMapScreen = () => {
           longitude: Number(data.longitude),
         },
       }));
-    };
+    });
 
-    socket.on("locationUpdated", handler);
-
-    return () => {
-      socket.off("locationUpdated", handler);
-    };
+    return () => socket.off("locationUpdated");
   }, []);
+
+  // 🚗 FAKE SIMULATION FOR OTHER MISSIONS
+  useEffect(() => {
+    const intervals = [];
+
+    missions.forEach((mission) => {
+      if (Number(mission.id) === LIVE_MISSION_ID) return; // skip live
+
+      const pickup =
+        cityCoordinates[normalizeCity(mission.pickupLocation)];
+      const dropoff =
+        cityCoordinates[normalizeCity(mission.dropoffLocation)];
+
+      if (!pickup || !dropoff) return;
+
+      let progress = 0;
+
+      const interval = setInterval(() => {
+        progress += 0.03;
+
+        if (progress >= 1) {
+          clearInterval(interval);
+          return;
+        }
+
+        const latitude =
+          pickup.latitude +
+          (dropoff.latitude - pickup.latitude) * progress;
+
+        const longitude =
+          pickup.longitude +
+          (dropoff.longitude - pickup.longitude) * progress;
+
+        setDriverPositions((prev) => ({
+          ...prev,
+          [String(mission.id)]: { latitude, longitude },
+        }));
+      }, 300);
+
+      intervals.push(interval);
+    });
+
+    return () => intervals.forEach(clearInterval);
+  }, [missions]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -83,7 +122,7 @@ const ReceiverMapScreen = () => {
 
           if (!pickup || !dropoff) return null;
 
-          const missionKey = String(mission.id);
+          const id = String(mission.id);
 
           return (
             <React.Fragment key={mission.id}>
@@ -100,10 +139,18 @@ const ReceiverMapScreen = () => {
               {/* END */}
               <Marker coordinate={dropoff} />
 
-              {/* 🚗 DRIVER REAL POSITION */}
-              {driverPositions[missionKey] && (
-                <Marker coordinate={driverPositions[missionKey]}>
-                  <MaterialIcons name="local-taxi" size={40} color="red" />
+              {/* 🚗 DRIVER (LIVE + FAKE) */}
+              {driverPositions[id] && (
+                <Marker coordinate={driverPositions[id]}>
+                  <MaterialIcons
+                    name="local-taxi"
+                    size={40}
+                    color={
+                      Number(mission.id) === LIVE_MISSION_ID
+                        ? "red"
+                        : "orange"
+                    }
+                  />
                 </Marker>
               )}
             </React.Fragment>
@@ -122,9 +169,8 @@ const ReceiverMapScreen = () => {
           borderRadius: 10,
         }}
       >
-        <Text>🚗 Tracking temps réel</Text>
-        <Text>📡 WebSocket actif</Text>
-        <Text>📍 Receiver uniquement ses missions</Text>
+        <Text>🔴 Mission live (WebSocket)</Text>
+        <Text>🟠 Missions simulées</Text>
       </View>
     </View>
   );
