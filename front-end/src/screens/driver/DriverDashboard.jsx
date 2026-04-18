@@ -1,3 +1,5 @@
+// src/screens/driver/DriverDashboard.jsx
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -7,13 +9,15 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import AuthAPI from "../../services/AuthAPI";
-import styles from "../../styles/driverDashboardStyle";
-import { useDispatch } from "react-redux";
 import { logout } from "../../redux/authSlice";
+import styles from "../../styles/driverDashboardStyle";
+
 const DriverDashboard = ({ navigation }) => {
   const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+
   const [missions, setMissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -33,10 +37,11 @@ const DriverDashboard = ({ navigation }) => {
         (m) => Number(m.driverId) === Number(user?.id)
       );
       setMissions(myMissions);
-      const accepted = myMissions.filter((m) => m.status === "accepted").length;
-      const inProgress = myMissions.filter((m) => m.status === "in_progress").length;
-      const completed = myMissions.filter((m) => m.status === "completed").length;
-      setStats({ accepted, inProgress, completed });
+      setStats({
+        accepted: myMissions.filter((m) => m.status === "accepted").length,
+        inProgress: myMissions.filter((m) => m.status === "in_progress").length,
+        completed: myMissions.filter((m) => m.status === "completed").length,
+      });
     } catch (err) {
       console.log("Error fetching missions:", err);
     } finally {
@@ -44,89 +49,144 @@ const DriverDashboard = ({ navigation }) => {
     }
   };
 
-  const dispatch = useDispatch();
-
   const handleLogout = () => {
     dispatch(logout());
     navigation.replace("Login");
   };
 
-
-  const getStatusColor = (status) => {
-    if (status === "accepted") return "#007bff";
-    if (status === "in_progress") return "#fd7e14";
-    if (status === "completed") return "#28a745";
-    return "#6c757d";
+  const getStatusConfig = (status) => {
+    switch (status) {
+      case "accepted":
+        return { color: "#4F46E5", bg: "#EEF2FF", label: "Accepted" };
+      case "in_progress":
+        return { color: "#D97706", bg: "#FFFBEB", label: "In Progress" };
+      case "completed":
+        return { color: "#059669", bg: "#ECFDF5", label: "Completed" };
+      default:
+        return { color: "#6B7280", bg: "#F3F4F6", label: status };
+    }
   };
+
+  const getInitials = (name) =>
+    name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
 
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator size="large" color="#4F46E5" />
       </SafeAreaView>
     );
   }
 
   const recentMissions = missions.slice(0, 3);
 
+  const STATS = [
+    { label: "Accepted", value: stats.accepted, color: "#4F46E5", bg: "#EEF2FF" },
+    { label: "In Progress", value: stats.inProgress, color: "#D97706", bg: "#FFFBEB" },
+    { label: "Completed", value: stats.completed, color: "#059669", bg: "#ECFDF5" },
+  ];
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>🚚 Driver Dashboard</Text>
-        <Text style={styles.subtitle}>Welcome, {user?.fullName || "Driver"}!</Text>
+
+        {/* HEADER */}
+        <View style={styles.header}>
+          <View style={styles.avatarCircle}>
+            <Text style={styles.avatarText}>{getInitials(user?.fullName)}</Text>
+          </View>
+          <View>
+            <Text style={styles.greeting}>Welcome back 👋</Text>
+            <Text style={styles.title}>{user?.fullName || "Driver"}</Text>
+          </View>
+        </View>
 
         {/* STATS */}
+        <Text style={styles.sectionTitle}>Overview</Text>
         <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{stats.accepted}</Text>
-            <Text style={styles.statLabel}>Accepted</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{stats.inProgress}</Text>
-            <Text style={styles.statLabel}>In Progress</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{stats.completed}</Text>
-            <Text style={styles.statLabel}>Completed</Text>
-          </View>
+          {STATS.map((stat) => (
+            <View
+              key={stat.label}
+              style={[styles.statCard, { backgroundColor: stat.bg }]}
+            >
+              <Text style={[styles.statNumber, { color: stat.color }]}>
+                {stat.value}
+              </Text>
+              <Text style={[styles.statLabel, { color: stat.color }]}>
+                {stat.label}
+              </Text>
+            </View>
+          ))}
         </View>
 
         {/* RECENT MISSIONS */}
         <Text style={styles.sectionTitle}>Recent Missions</Text>
+
         {recentMissions.length === 0 ? (
-          <Text style={styles.emptyText}>No missions yet</Text>
+          <View style={styles.emptyBox}>
+            <Text style={styles.emptyIcon}>📭</Text>
+            <Text style={styles.emptyText}>No missions yet</Text>
+          </View>
         ) : (
-          recentMissions.map((mission) => (
-            <View key={mission.id} style={styles.missionCard}>
-              <Text style={styles.missionText}>📍 {mission.pickupLocation}</Text>
-              <Text style={styles.missionText}>📦 {mission.dropoffLocation}</Text>
-              <Text
-                style={[
-                  styles.missionText,
-                  styles.statusBadge,
-                  { color: getStatusColor(mission.status) },
-                ]}
-              >
-                Status: {mission.status}
-              </Text>
-            </View>
-          ))
+          recentMissions.map((mission) => {
+            const statusConfig = getStatusConfig(mission.status);
+            return (
+              <View key={mission.id} style={styles.missionCard}>
+
+                <View style={styles.missionRow}>
+                  <Text style={styles.missionIcon}>📍</Text>
+                  <View style={styles.missionInfo}>
+                    <Text style={styles.missionLabel}>Pickup</Text>
+                    <Text style={styles.missionValue}>{mission.pickupLocation}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.missionDivider} />
+
+                <View style={styles.missionRow}>
+                  <Text style={styles.missionIcon}>📦</Text>
+                  <View style={styles.missionInfo}>
+                    <Text style={styles.missionLabel}>Dropoff</Text>
+                    <Text style={styles.missionValue}>{mission.dropoffLocation}</Text>
+                  </View>
+                </View>
+
+                <View
+                  style={[
+                    styles.statusBadge,
+                    { backgroundColor: statusConfig.bg },
+                  ]}
+                >
+                  <Text style={[styles.statusText, { color: statusConfig.color }]}>
+                    {statusConfig.label}
+                  </Text>
+                </View>
+
+              </View>
+            );
+          })
         )}
 
         {/* BUTTONS */}
         <TouchableOpacity
-          style={styles.button}
+          style={styles.primaryButton}
           onPress={() => navigation.navigate("App", { screen: "Trips" })}
         >
-          <Text style={styles.buttonText}>View All Trips</Text>
+          <Text style={styles.primaryButtonText}>View All Trips</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#dc3545", marginTop: 10 }]}
+          style={styles.logoutButton}
           onPress={handleLogout}
         >
-          <Text style={styles.buttonText}>Logout</Text>
+          <Text style={styles.logoutButtonText}>🚪  Logout</Text>
         </TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   );

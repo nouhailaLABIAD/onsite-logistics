@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { MissionsModule } from './missions/missions.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { TrackingModule } from './tracking/tracking.module';
+import { NotificationService } from './notification/notification.service';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -31,7 +33,8 @@ import { TrackingModule } from './tracking/tracking.module';
     }),
 
     UserModule, 
-    AuthModule, MissionsModule, VehiclesModule, TrackingModule,
+    AuthModule, MissionsModule, VehiclesModule, TrackingModule, NotificationModule,
   ],
+  providers: [NotificationService],
 })
 export class AppModule {}

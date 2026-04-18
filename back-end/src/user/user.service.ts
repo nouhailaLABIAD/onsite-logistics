@@ -60,4 +60,14 @@ async changePassword(userId: number, dto: UpdatePasswordDto) {
     message: "Password updated successfully",
   };
 }
+async savePushToken(userId: number, token: string) {
+  const user = await this.userRepo.findOne({ where: { id: userId } });
+
+  if (!user) {
+    throw new BadRequestException("User not found");
+  }
+
+  user.pushToken = token;
+  return this.userRepo.save(user);
+}
 }

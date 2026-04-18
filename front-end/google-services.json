@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "18517719484",
+    "project_id": "front-end-5c7e2",
+    "storage_bucket": "front-end-5c7e2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:18517719484:android:39e524dbfb6f746ca653b9",
+        "android_client_info": {
+          "package_name": "com.nouha_labiad.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiK2Cun2GTIfARH5DbPOnCOIoK35j5DYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

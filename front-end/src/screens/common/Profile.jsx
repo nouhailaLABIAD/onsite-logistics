@@ -1,5 +1,14 @@
+// src/screens/profile/Profile.jsx
+
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, TextInput, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from "react-redux";
 import AuthAPI from "../../services/AuthAPI";
@@ -11,31 +20,37 @@ const Profile = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const [isEditing, setIsEditing] = useState(false);
-
   const [fullName, setFullName] = useState(user?.fullName || "");
   const [email, setEmail] = useState(user?.email || "");
+  const [loading, setLoading] = useState(false);
 
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#4F46E5" />
       </SafeAreaView>
     );
   }
 
+  const getInitials = (name) => {
+    return name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   const handleSave = async () => {
     try {
-      const res = await AuthAPI.patch("/users/profile", {
-        fullName,
-        email,
-      });
-
-      // update redux si besoin
+      setLoading(true);
+      const res = await AuthAPI.patch("/users/profile", { fullName, email });
       dispatch({ type: "auth/updateUser", payload: res.data });
-
       setIsEditing(false);
     } catch (err) {
       console.log("UPDATE ERROR:", err.response?.data);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,9 +64,14 @@ const Profile = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
 
-        <View style={styles.avatarContainer}>
+        {/* AVATAR HEADER */}
+        <View style={styles.header}>
+          <View style={styles.avatarCircle}>
+            <Text style={styles.avatarText}>{getInitials(fullName)}</Text>
+          </View>
+
           <Text style={styles.name}>
             {isEditing ? "Edit Profile" : fullName}
           </Text>
@@ -61,59 +81,84 @@ const Profile = ({ navigation }) => {
           </View>
         </View>
 
-        {/* FULL NAME */}
-        <View style={styles.infoCard}>
-          <Text style={styles.infoLabel}>Full Name</Text>
+        {/* FORM CARD */}
+        <View style={styles.card}>
 
-          {isEditing ? (
-            <TextInput
-              value={fullName}
-              onChangeText={setFullName}
-              style={{ borderBottomWidth: 1 }}
-            />
-          ) : (
-            <Text style={styles.infoValue}>{fullName}</Text>
-          )}
+          {/* FULL NAME */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Full Name</Text>
+            {isEditing ? (
+              <TextInput
+                value={fullName}
+                onChangeText={setFullName}
+                style={styles.input}
+                placeholderTextColor="#C4C4C4"
+                placeholder="Enter your name"
+              />
+            ) : (
+              <Text style={styles.infoValue}>{fullName}</Text>
+            )}
+          </View>
+
+          <View style={styles.divider} />
+
+          {/* EMAIL */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Email</Text>
+            {isEditing ? (
+              <TextInput
+                value={email}
+                onChangeText={setEmail}
+                style={styles.input}
+                placeholderTextColor="#C4C4C4"
+                placeholder="Enter your email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            ) : (
+              <Text style={styles.infoValue}>{email}</Text>
+            )}
+          </View>
+
         </View>
 
-        {/* EMAIL */}
-        <View style={styles.infoCard}>
-          <Text style={styles.infoLabel}>Email</Text>
-
-          {isEditing ? (
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              style={{ borderBottomWidth: 1 }}
-            />
-          ) : (
-            <Text style={styles.infoValue}>{email}</Text>
-          )}
-        </View>
-
-        {/* BUTTONS */}
+        {/* EDIT / SAVE BUTTON */}
         {!isEditing ? (
           <TouchableOpacity
-            style={styles.button}
+            style={styles.editButton}
             onPress={() => setIsEditing(true)}
           >
-            <Text style={styles.buttonText}>✏️ Edit Profile</Text>
+            <Text style={styles.editButtonText}>✏️  Edit Profile</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleSave}
-          >
-            <Text style={styles.buttonText}>💾 Save</Text>
-          </TouchableOpacity>
+          <View style={styles.editActions}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setIsEditing(false)}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.saveButton, loading && styles.buttonDisabled]}
+              onPress={handleSave}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.saveButtonText}>💾  Save</Text>
+              )}
+            </TouchableOpacity>
+          </View>
         )}
 
         {/* CHANGE PASSWORD */}
         <TouchableOpacity
-          style={styles.button}
+          style={styles.outlineButton}
           onPress={() => navigation.navigate("ChangePassword")}
         >
-          <Text style={styles.buttonText}>🔒 Change Password</Text>
+          <Text style={styles.outlineButtonText}>🔒  Change Password</Text>
         </TouchableOpacity>
 
         {/* LOGOUT */}
@@ -121,7 +166,7 @@ const Profile = ({ navigation }) => {
           style={styles.logoutButton}
           onPress={handleLogout}
         >
-          <Text style={styles.buttonText}>🚪 Logout</Text>
+          <Text style={styles.logoutButtonText}>🚪  Logout</Text>
         </TouchableOpacity>
 
       </ScrollView>

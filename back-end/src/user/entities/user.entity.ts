@@ -18,4 +18,6 @@ export class User {
 
   @Column({ default: "receiver" })
   role: UserRole;
+  @Column({ nullable: true }) 
+  pushToken: string;
 }

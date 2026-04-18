@@ -1,45 +1,161 @@
+// src/styles/receiverParcelsStyle.js
+
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "#1e1e1e",
-    marginBottom: 20,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginTop: 50,
-  },
-  card: {
-    backgroundColor: "#f8f9fa",
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-  cardText: {
-    fontSize: 14,
-    color: "#444",
-    marginBottom: 4,
-  },
-  statusText: {
-    fontWeight: "500",
-    marginTop: 4,
+    backgroundColor: "#F4F6FC",
+    paddingHorizontal: 24,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#F4F6FC",
+  },
+
+  // ── HEADER ──
+  header: {
+    marginTop: 28,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: "#1E1E2D",
+    letterSpacing: 0.3,
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#9CA3AF",
+    fontWeight: "500",
+  },
+
+  // ── TABS ──
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#EBEBF0",
+    borderRadius: 14,
+    padding: 4,
+    marginBottom: 20,
+    gap: 4,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    borderRadius: 11,
+    gap: 6,
+  },
+  tabActive: {
     backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  tabText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#9CA3AF",
+  },
+  tabTextActive: {
+    color: "#4F46E5",
+    fontWeight: "700",
+  },
+  tabBadge: {
+    backgroundColor: "#E5E7EB",
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  tabBadgeActive: {
+    backgroundColor: "#EEF2FF",
+  },
+  tabBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#9CA3AF",
+  },
+  tabBadgeTextActive: {
+    color: "#4F46E5",
+  },
+
+  // ── CARD ──
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+    gap: 10,
+  },
+
+  // ── STATUS BADGE ──
+  statusBadge: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+  },
+  statusBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
+
+  // ── LOCATION ──
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  locationIcon: {
+    fontSize: 20,
+  },
+  locationInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  locationLabel: {
+    fontSize: 11,
+    color: "#9CA3AF",
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  locationValue: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1E1E2D",
+  },
+  locationDivider: {
+    height: 1,
+    backgroundColor: "#F3F4F6",
+    marginLeft: 30,
+  },
+
+  // ── EMPTY ──
+  emptyBox: {
+    alignItems: "center",
+    paddingVertical: 60,
+    gap: 10,
+  },
+  emptyIcon: {
+    fontSize: 40,
+  },
+  emptyText: {
+    color: "#9CA3AF",
+    fontSize: 14,
+    fontWeight: "500",
   },
 });

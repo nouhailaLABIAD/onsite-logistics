@@ -4,9 +4,15 @@ import { MissionsController } from './missions.controller';
 import { Mission } from './entities/mission.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { User } from '../user/entities/user.entity';
+import { NotificationModule } from '../notification/notification.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Mission])],
+  imports: [
+    TypeOrmModule.forFeature([Mission, User]),
+    NotificationModule,
+  ],
   providers: [MissionsService],
-  controllers: [MissionsController]
+  controllers: [MissionsController],
 })
 export class MissionsModule {}

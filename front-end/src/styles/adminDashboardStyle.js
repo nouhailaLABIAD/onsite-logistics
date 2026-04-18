@@ -1,80 +1,196 @@
+// src/styles/adminDashboardStyle.js
+
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 20,
+    backgroundColor: "#F4F6FC",
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#1e1e1e",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginBottom: 30,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 30,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-    padding: 15,
-    marginHorizontal: 5,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#007bff",
-  },
-  statLabel: {
-    fontSize: 12,
-    color: "#555",
-    marginTop: 5,
-    textAlign: "center",
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginBottom: 12,
-    color: "#333",
-  },
-  actionButton: {
-    backgroundColor: "#007bff",
-    paddingVertical: 12,
+  scrollContent: {
     paddingHorizontal: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 12,
+    paddingBottom: 40,
   },
-  actionButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  logoutButton: {
-    backgroundColor: "#dc3545",
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
-  },
+
+  // ── LOADING ──
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#F4F6FC",
+    gap: 12,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: "#9CA3AF",
+    fontWeight: "500",
+  },
+
+  // ── HEADER ──
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 28,
+  },
+  greeting: {
+    fontSize: 14,
+    color: "#9CA3AF",
+    fontWeight: "500",
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#1E1E2D",
+  },
+  adminBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: "#EEF2FF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  adminBadgeIcon: {
+    fontSize: 26,
+  },
+
+  // ── ROLE BADGE ──
+  roleBadgeRow: {
+    marginBottom: 24,
+  },
+  roleBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "#EEF2FF",
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: "#C7D2FE",
+  },
+  roleBadgeText: {
+    color: "#4F46E5",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
+
+  // ── STATS GRID ──
+  statsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+    marginBottom: 28,
+  },
+  statCard: {
+    width: "47%",
     backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+    alignItems: "center",
+    borderTopWidth: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  statIcon: {
+    fontSize: 24,
+    marginBottom: 8,
+  },
+  statNumber: {
+    fontSize: 30,
+    fontWeight: "800",
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: "#9CA3AF",
+    fontWeight: "600",
+    textAlign: "center",
+  },
+
+  // ── SECTION TITLE ──
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1E1E2D",
+    marginBottom: 14,
+  },
+
+  // ── ACTIONS ──
+  actionsContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  actionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 14,
+    gap: 14,
+  },
+  actionIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  actionIcon: {
+    fontSize: 20,
+  },
+  actionInfo: {
+    flex: 1,
+  },
+  actionTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1E1E2D",
+    marginBottom: 2,
+  },
+  actionSubtitle: {
+    fontSize: 12,
+    color: "#9CA3AF",
+    fontWeight: "400",
+  },
+  actionArrow: {
+    fontSize: 24,
+    color: "#C4C4C4",
+    fontWeight: "300",
+  },
+  actionDivider: {
+    height: 1,
+    backgroundColor: "#F3F4F6",
+    marginLeft: 58,
+  },
+
+  // ── LOGOUT ──
+  logoutButton: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    paddingVertical: 15,
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: "#EF4444",
+    shadowColor: "#EF4444",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  logoutText: {
+    color: "#EF4444",
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
 });
